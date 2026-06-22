@@ -108,7 +108,7 @@ nav.scrolled{background:rgba(8,10,24,.7);backdrop-filter:blur(16px);border-botto
 .btn-wa:hover{transform:translateY(-3px);box-shadow:0 0 30px rgba(37,211,102,.55)}
 
 /* ===== HERO ===== */
-#hero{min-height:100vh;display:flex;align-items:center;padding:120px 0 80px}
+#hero{min-height:100vh;min-height:100svh;display:flex;align-items:center;padding:120px 0 80px}
 .hero-grid{display:grid;grid-template-columns:1.25fr .9fr;gap:40px;align-items:center}
 .eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:'Orbitron';font-size:.72rem;letter-spacing:2px;color:var(--cyan);border:1px solid var(--glass-border);background:var(--glass);padding:8px 16px;border-radius:50px;margin-bottom:24px;backdrop-filter:blur(8px)}
 .eyebrow .pulse{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);animation:pulse 1.6s infinite}
@@ -388,6 +388,10 @@ footer{position:relative;padding-top:80px;margin-top:40px}
 </footer>
 
 <script>
+/* ================= Device / motion flags ================= */
+const IS_MOBILE = matchMedia('(max-width:820px)').matches || ('ontouchstart' in window);
+const REDUCE_MOTION = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 /* ================= Services data ================= */
 const SERVICES = [
   {ic:'💻',t:'Software Development',d:'Custom, scalable software tailored to your business workflow and goals.'},
@@ -428,31 +432,42 @@ addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>40));
 
 /* ================= Mobile menu ================= */
 const burger=document.getElementById('burger'), navlinks=document.getElementById('navlinks');
-burger.addEventListener('click',()=>{burger.classList.toggle('open');navlinks.classList.toggle('open');});
-navlinks.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{burger.classList.remove('open');navlinks.classList.remove('open');}));
-
-/* ================= Custom cursor ================= */
-const dot=document.querySelector('.cursor-dot'), ring=document.querySelector('.cursor-ring');
-let mx=0,my=0,rx=0,ry=0;
-addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px';});
-function ringLoop(){rx+=(mx-rx)*.18;ry+=(my-ry)*.18;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(ringLoop);}
-ringLoop();
-document.querySelectorAll('a,button,.card,.why-card,.badge-mini').forEach(el=>{
-  el.addEventListener('mouseenter',()=>ring.classList.add('active'));
-  el.addEventListener('mouseleave',()=>ring.classList.remove('active'));
+function setMenu(open){
+  burger.classList.toggle('open',open);
+  navlinks.classList.toggle('open',open);
+  document.body.style.overflow=open?'hidden':'';
+}
+burger.addEventListener('click',()=>setMenu(!navlinks.classList.contains('open')));
+navlinks.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>setMenu(false)));
+// Tap outside the panel to close.
+document.addEventListener('click',e=>{
+  if(navlinks.classList.contains('open') && !navlinks.contains(e.target) && !burger.contains(e.target)) setMenu(false);
 });
 
-/* ================= 3D card tilt ================= */
-document.addEventListener('mousemove',e=>{
-  document.querySelectorAll('.card').forEach(card=>{
-    const r=card.getBoundingClientRect();
-    if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom){
-      card.style.transform=''; return;
-    }
-    const px=(e.clientX-r.left)/r.width-.5, py=(e.clientY-r.top)/r.height-.5;
-    card.style.transform=`perspective(700px) rotateY(${px*12}deg) rotateX(${-py*12}deg) translateY(-6px)`;
+/* ================= Custom cursor (desktop only) ================= */
+if(!IS_MOBILE){
+  const dot=document.querySelector('.cursor-dot'), ring=document.querySelector('.cursor-ring');
+  let mx=0,my=0,rx=0,ry=0;
+  addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px';});
+  function ringLoop(){rx+=(mx-rx)*.18;ry+=(my-ry)*.18;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(ringLoop);}
+  ringLoop();
+  document.querySelectorAll('a,button,.card,.why-card,.badge-mini').forEach(el=>{
+    el.addEventListener('mouseenter',()=>ring.classList.add('active'));
+    el.addEventListener('mouseleave',()=>ring.classList.remove('active'));
   });
-});
+
+  /* ================= 3D card tilt ================= */
+  document.addEventListener('mousemove',e=>{
+    document.querySelectorAll('.card').forEach(card=>{
+      const r=card.getBoundingClientRect();
+      if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom){
+        card.style.transform=''; return;
+      }
+      const px=(e.clientX-r.left)/r.width-.5, py=(e.clientY-r.top)/r.height-.5;
+      card.style.transform=`perspective(700px) rotateY(${px*12}deg) rotateX(${-py*12}deg) translateY(-6px)`;
+    });
+  });
+}
 
 /* ================= GSAP scroll reveals ================= */
 gsap.registerPlugin(ScrollTrigger);
@@ -476,14 +491,14 @@ document.querySelectorAll('.count').forEach(el=>{
 /* ================= Three.js background ================= */
 (function(){
   const canvas=document.getElementById('bg3d');
-  const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
-  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:!IS_MOBILE});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,IS_MOBILE?1.5:2));
   const scene=new THREE.Scene();
   const camera=new THREE.PerspectiveCamera(70,innerWidth/innerHeight,.1,1000);
   camera.position.z=6;
 
   // particle network sphere
-  const COUNT=900;
+  const COUNT=IS_MOBILE?380:900;
   const geo=new THREE.BufferGeometry();
   const pos=new Float32Array(COUNT*3);
   for(let i=0;i<COUNT;i++){
@@ -512,16 +527,27 @@ document.querySelectorAll('.count').forEach(el=>{
   scene.add(ico2);
 
   let tx=0,ty=0;
-  addEventListener('mousemove',e=>{tx=(e.clientX/innerWidth-.5);ty=(e.clientY/innerHeight-.5);});
+  if(!IS_MOBILE) addEventListener('mousemove',e=>{tx=(e.clientX/innerWidth-.5);ty=(e.clientY/innerHeight-.5);});
 
+  let lastW=innerWidth;
   function resize(){
     renderer.setSize(innerWidth,innerHeight);
     camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();
   }
-  addEventListener('resize',resize);resize();
+  // On mobile, scrolling shows/hides the address bar and fires resize with only a
+  // height change — ignore those so the canvas (and layout) don't jitter.
+  addEventListener('resize',()=>{
+    if(IS_MOBILE && innerWidth===lastW) return;
+    lastW=innerWidth; resize();
+  });
+  resize();
 
-  function animate(){
+  // Throttle to ~30fps on mobile to keep the GPU cool and scrolling smooth.
+  let last=0;
+  function animate(now){
     requestAnimationFrame(animate);
+    if(IS_MOBILE && now-last<33) return;
+    last=now;
     points.rotation.y+=.0012; points.rotation.x+=.0006;
     ico.rotation.y-=.003; ico.rotation.x+=.002;
     ico2.rotation.y+=.0015; ico2.rotation.z-=.001;
@@ -531,7 +557,8 @@ document.querySelectorAll('.count').forEach(el=>{
     camera.lookAt(scene.position);
     renderer.render(scene,camera);
   }
-  animate();
+  if(REDUCE_MOTION){ camera.lookAt(scene.position); renderer.render(scene,camera); }
+  else requestAnimationFrame(animate);
 })();
 
 /* ================= Floating code symbols canvas ================= */
@@ -542,7 +569,7 @@ document.querySelectorAll('.count').forEach(el=>{
   function init(){
     c.width=innerWidth;c.height=innerHeight;
     parts=[];
-    const n=Math.min(40,Math.floor(innerWidth/35));
+    const n=Math.min(IS_MOBILE?16:40,Math.floor(innerWidth/(IS_MOBILE?40:35)));
     for(let i=0;i<n;i++){
       parts.push({
         x:Math.random()*c.width,y:Math.random()*c.height,
@@ -553,19 +580,32 @@ document.querySelectorAll('.count').forEach(el=>{
       });
     }
   }
-  function draw(){
+  function render(move){
     ctx.clearRect(0,0,c.width,c.height);
     ctx.font='600 16px Orbitron, monospace';
     parts.forEach(p=>{
       ctx.font=`600 ${p.size}px Orbitron, monospace`;
       ctx.fillStyle=`hsla(${p.hue},${p.a})`;
       ctx.fillText(p.s,p.x,p.y);
-      p.y-=p.vy;
-      if(p.y<-20){p.y=c.height+20;p.x=Math.random()*c.width;}
+      if(move){ p.y-=p.vy; if(p.y<-20){p.y=c.height+20;p.x=Math.random()*c.width;} }
     });
-    requestAnimationFrame(draw);
   }
-  addEventListener('resize',init);init();draw();
+  let last=0;
+  function draw(now){
+    requestAnimationFrame(draw);
+    if(IS_MOBILE && now-last<33) return;
+    last=now;
+    render(true);
+  }
+  // Width-guarded resize: ignore mobile address-bar height changes so symbols
+  // don't re-seed and flicker while scrolling.
+  let lastW=innerWidth;
+  addEventListener('resize',()=>{
+    if(IS_MOBILE && innerWidth===lastW) return;
+    lastW=innerWidth; init();
+  });
+  init();
+  if(REDUCE_MOTION) render(false); else requestAnimationFrame(draw);
 })();
 </script>
 </body>
