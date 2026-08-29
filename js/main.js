@@ -1,13 +1,11 @@
 /* ============================================================
-   main.js — core UI: nav, mobile menu, typing effect, service
-   cards, scroll reveals, animated counters, and the conditional
-   loader for the heavier optional scripts (cursor, 3D bg, canvas).
+   main.js — core UI: nav, mobile menu, work/research row
+   injection, scroll reveals, and the conditional loader for the
+   hero's Three.js background.
 
-   No GSAP/ScrollTrigger here on purpose — the reveal/counter/hero
-   effects below are simple opacity+transform tweens that plain
-   CSS transitions/keyframes + IntersectionObserver handle fine,
-   so the ~120KB GSAP + ScrollTrigger payload and ScrollTrigger's
-   scroll listeners are avoided entirely (see README.md).
+   No GSAP/ScrollTrigger here on purpose — the reveal effects below
+   are simple opacity+transform tweens that plain CSS transitions +
+   IntersectionObserver handle fine.
 
    will-change is applied only while something is actually
    animating (right before an IntersectionObserver reveal fires,
@@ -19,42 +17,73 @@ const FLAGS = window.__FLAGS;
 const IS_MOBILE = FLAGS.IS_MOBILE;
 const REDUCE_MOTION = FLAGS.REDUCE_MOTION;
 
-/* ================= Services data ================= */
-const SERVICES = [
-  {ic:'💻',t:'Software Development',d:'Custom, scalable software tailored to your business workflow and goals.'},
-  {ic:'🌐',t:'Web Development',d:'Lightning-fast, responsive websites & web apps with modern stacks.'},
-  {ic:'🤖',t:'Android Applications',d:'Native Android apps that are smooth, secure and user-first.'},
-  {ic:'📱',t:'Flutter Applications',d:'Cross-platform apps from a single codebase — iOS & Android.'},
-  {ic:'🧠',t:'AI-Based Systems',d:'Intelligent systems & automation that work while you sleep.'},
-  {ic:'📊',t:'Machine Learning',d:'Predictive models & data pipelines that turn data into decisions.'},
-  {ic:'🎨',t:'UI / UX Design',d:'Clean, modern interfaces designed to convert and delight users.'},
-  {ic:'☁️',t:'APIs & Cloud',d:'Robust backends, REST/GraphQL APIs and cloud deployments.'}
+/* ================= Work (featured projects) ================= */
+const WORK = [
+  {
+    index: '01 / 03',
+    title: 'Evalix — Exam Management System',
+    img: 'images/projects/exam-system.jpg',
+    problem: 'Institutions need to run high-stakes exams remotely without sacrificing academic integrity.',
+    built: 'A multi-tenant SaaS platform with AI-based proctoring (noise, eye-movement, face &amp; object detection), LLM-generated exams, CLO mapping, and live video/audio streaming.',
+    stack: ['Next.js','TypeScript','Supabase','PostgreSQL','CV proctoring pipeline'],
+    live: 'exam-system-sigma.vercel.app',
+    href: 'https://exam-system-sigma.vercel.app'
+  },
+  {
+    index: '02 / 03',
+    title: 'ZapMail',
+    img: 'images/projects/zapmail.jpg',
+    problem: 'Disposable-email tools usually force a sign-up or expire before you’re done needing them.',
+    built: 'A permanent, no-signup disposable inbox on a serverless MIME ingestion pipeline, with inbox updates delivered in real time via Supabase Realtime.',
+    stack: ['Next.js','TypeScript','Supabase Realtime','Serverless MIME parsing','Cloudflare'],
+    live: 'zapmail.store',
+    href: 'https://zapmail.store'
+  },
+  {
+    index: '03 / 03',
+    title: "Sam’s Makeup Studio — Salon Booking System",
+    img: 'images/projects/salon-booking.jpg',
+    problem: 'A growing salon needed client bookings and admin operations in one place — not spreadsheets and DMs.',
+    built: 'A client booking and admin management platform with WhatsApp integration for confirmations and follow-ups.',
+    stack: ['Next.js','TypeScript','Tailwind CSS','Supabase','PostgreSQL'],
+    live: 'sams-makeup-studio.vercel.app',
+    href: 'https://sams-makeup-studio.vercel.app'
+  }
 ];
-const grid = document.getElementById('servicesGrid');
-SERVICES.forEach(s=>{
-  const c = document.createElement('div');
-  c.className='card reveal';
-  c.innerHTML = `<div class="ico">${s.ic}</div><h3>${s.t}</h3><p>${s.d}</p>`;
-  grid.appendChild(c);
+const workList = document.getElementById('workList');
+WORK.forEach((w,i)=>{
+  const row = document.createElement('div');
+  row.className = 'work-row reveal' + (i%2 ? ' flip' : '');
+  row.innerHTML = `
+    <div class="work-media"><img src="${w.img}" alt="${w.title} — screenshot" loading="lazy" decoding="async" width="1400" height="759" /></div>
+    <div class="work-body">
+      <span class="work-index">${w.index}</span>
+      <h3 class="work-title"><a href="${w.href}" target="_blank" rel="noopener">${w.title}</a></h3>
+      <div class="work-spec">
+        <div class="work-spec-row"><span class="work-spec-k">Problem</span><span class="work-spec-v">${w.problem}</span></div>
+        <div class="work-spec-row"><span class="work-spec-k">Built</span><span class="work-spec-v">${w.built}</span></div>
+      </div>
+      <div class="work-stack">${w.stack.map(s=>`<span>${s}</span>`).join('')}</div>
+      <a class="work-link" href="${w.href}" target="_blank" rel="noopener">View live — ${w.live} ↗</a>
+    </div>`;
+  workList.appendChild(row);
 });
 
-/* ================= Typing animation ================= */
-const words = ['Software','Web Apps','Android Apps','Flutter Apps','AI Solutions','ML Systems'];
-const typedEl = document.getElementById('typed');
-if(REDUCE_MOTION){
-  typedEl.textContent = words[0];
-} else {
-  let wi=0, ci=0, deleting=false;
-  (function type(){
-    const w = words[wi];
-    typedEl.textContent = w.slice(0,ci);
-    if(!deleting && ci<w.length){ci++;}
-    else if(deleting && ci>0){ci--;}
-    else if(!deleting && ci===w.length){deleting=true;setTimeout(type,1400);return;}
-    else {deleting=false;wi=(wi+1)%words.length;}
-    setTimeout(type, deleting?45:90);
-  })();
-}
+/* ================= Research ================= */
+const RESEARCH = [
+  {tag:'Healthcare ML', title:'Chronic Kidney Disease Prediction', d:'ML models trained on clinical data to support early CKD risk detection.'},
+  {tag:'Applied ML', title:'Fashion &amp; Cultural Preference Analysis', d:'Data-driven analysis of fashion preference patterns across cultural contexts.'},
+  {tag:'Explainable AI', title:'Explainable Drug–Protein Interaction Prediction', d:'Interpretable ML models for predicting drug–protein interactions.'}
+];
+const researchList = document.getElementById('researchList');
+RESEARCH.forEach(r=>{
+  const row = document.createElement('div');
+  row.className = 'research-row reveal';
+  row.innerHTML = `
+    <span class="research-tag">${r.tag}</span>
+    <div class="research-body"><h3>${r.title}</h3><p>${r.d}</p></div>`;
+  researchList.appendChild(row);
+});
 
 /* ================= Navbar scroll ================= */
 const nav=document.getElementById('nav');
@@ -98,50 +127,22 @@ if(REDUCE_MOTION){
       el.addEventListener('transitionend',()=>{ el.style.willChange='auto'; },{once:true});
       obs.unobserve(el);
     });
-  },{threshold:.15, rootMargin:'0px 0px -8% 0px'});
+  },{threshold:.12, rootMargin:'0px 0px -8% 0px'});
   revealEls.forEach((el,i)=>{
-    el.style.transitionDelay = `${(i%4)*0.08}s`;
+    el.style.transitionDelay = `${(i%3)*0.08}s`;
     revealObserver.observe(el);
   });
 }
 
-/* ================= Animated counters ================= */
-function animateCount(el,target,duration=1600){
-  const start=performance.now();
-  function tick(now){
-    const p=Math.min((now-start)/duration,1);
-    const eased=1-Math.pow(1-p,3); // ease-out-cubic, matches the old power3.out feel
-    el.textContent=Math.round(eased*target);
-    if(p<1) requestAnimationFrame(tick);
-  }
-  requestAnimationFrame(tick);
-}
-document.querySelectorAll('.count').forEach(el=>{
-  const target=+el.dataset.target;
-  if(REDUCE_MOTION){ el.textContent=target; return; }
-  const obs=new IntersectionObserver((entries,o)=>{
-    if(entries[0].isIntersecting){ animateCount(el,target); o.disconnect(); }
-  },{threshold:.6});
-  obs.observe(el);
-});
-
-/* ================= Conditional loading of optional scripts =================
-   - Custom cursor: desktop pointer devices only, skipped entirely for
-     touch/mobile and for reduced-motion users (it's a rAF loop).
-   - 3D background + floating-code canvas: deferred until window 'load' so
-     neither competes with first paint / LCP, which matters most on mobile. */
+/* ================= Conditional loading of the hero 3D scene =================
+   Skipped entirely on mobile/touch and for reduced-motion users — mobile
+   gets the static CSS gradient wash instead of a WebGL canvas. Deferred
+   until window 'load' so it never competes with first paint / LCP. */
 if(!IS_MOBILE && !REDUCE_MOTION){
-  const s = document.createElement('script');
-  s.src = 'js/cursor.js';
-  s.defer = true;
-  document.body.appendChild(s);
-}
-
-addEventListener('load', ()=>{
-  ['js/bg-scene.js','js/code-canvas.js'].forEach(src=>{
+  addEventListener('load', ()=>{
     const s = document.createElement('script');
-    s.src = src;
+    s.src = 'js/bg-scene.js';
     s.defer = true;
     document.body.appendChild(s);
   });
-});
+}

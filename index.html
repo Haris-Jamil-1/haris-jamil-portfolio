@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Haris Jamil — Smart Solutions Built for Your Success</title>
-<meta name="description" content="Haris Jamil — Software, Web, Android, Flutter, AI & Machine Learning solutions. Your Vision. Our Technology. Unlimited Possibilities." />
+<title>Haris Jamil — Full-Stack Developer &amp; AI/ML Researcher</title>
+<meta name="description" content="Haris Jamil — Full-Stack Developer and AI/ML Researcher in Lahore, Pakistan. I build production SaaS platforms and conduct applied ML/deep learning research." />
 
-<!-- Fonts -->
+<!-- Fonts: Fraunces (display serif), Inter (body), IBM Plex Mono (spec-sheet labels/utility) -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;0,900;1,500&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
 <link rel="stylesheet" href="css/style.css" />
 
@@ -30,53 +30,45 @@
 })();
 </script>
 
-<!-- Three.js is the only CDN library left (GSAP/ScrollTrigger were removed,
-     see README.md). Deferred so it never blocks first paint; js/bg-scene.js
-     itself is only injected after window 'load'. -->
+<!-- Three.js draws a small, subdued network confined to the hero only (see
+     js/bg-scene.js) — deferred so it never blocks first paint, and skipped
+     entirely on mobile/touch (see js/main.js loader). -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
 </head>
 <body>
 
-<!-- Backgrounds -->
 <div class="bg-gradient"></div>
-<canvas id="bg3d"></canvas>
-<canvas id="code-canvas"></canvas>
-
-<!-- Cursor (desktop pointer devices only — see js/cursor.js) -->
-<div class="cursor-dot"></div>
-<div class="cursor-ring"></div>
 
 <!-- NAV -->
 <nav id="nav">
   <div class="container nav-inner">
-    <a href="#hero" class="brand"><span class="dot"></span>HARIS<span class="gradient-text">.DEV</span></a>
+    <a href="#hero" class="brand">[&nbsp;Haris Jamil&nbsp;]<span class="brand-dot"></span></a>
     <button class="hamburger" id="burger" aria-label="Menu"><span></span><span></span><span></span></button>
     <div class="nav-links" id="navlinks">
-      <a class="nav-link" href="#hero">HOME</a>
-      <a class="nav-link" href="#about">ABOUT</a>
-      <a class="nav-link" href="#services">SERVICES</a>
-      <a class="nav-link" href="#why">WHY ME</a>
-      <a class="nav-link" href="#contact">CONTACT</a>
+      <a class="nav-link" href="#about">About</a>
+      <a class="nav-link" href="#skills">Skills</a>
+      <a class="nav-link" href="#work">Work</a>
+      <a class="nav-link" href="#research">Research</a>
+      <a class="nav-link" href="#contact">Contact</a>
     </div>
   </div>
 </nav>
 
 <!-- HERO -->
 <section id="hero">
+  <canvas id="bg3d" aria-hidden="true"></canvas>
   <div class="container hero-grid">
     <div class="hero-left">
-      <span class="eyebrow"><span class="pulse"></span>AVAILABLE FOR PROJECTS · PAKISTAN</span>
-      <h1 class="hero-title">Smart Solutions <span class="gradient-text">Built for Your Success</span></h1>
-      <div class="typed-wrap">I build <span class="typed" id="typed"></span><span class="cursor-blink"></span></div>
-      <p class="hero-sub">Your Vision. Our Technology. Unlimited Possibilities. I’m <strong>Haris Jamil</strong> — turning ideas into fast, reliable, and beautiful digital products.</p>
-      <p class="hero-tags">⚡ Software · Web · Android · Flutter · AI & Machine Learning</p>
+      <h1 class="hero-title">Full-Stack Developer<br />&amp; <em>AI/ML Researcher</em></h1>
+      <div class="hero-cta">
+        <a href="#work" class="btn btn-primary">View Work</a>
+        <a href="#contact" class="btn btn-ghost">Get in Touch</a>
+      </div>
     </div>
     <div class="portrait-wrap">
-      <div class="portrait-ring"><img src="haris.jpg" alt="Haris Jamil" width="836" height="878" fetchpriority="high" decoding="async" /></div>
-      <div class="float-badge fb1"><span class="ic">JS</span></div>
-      <div class="float-badge fb2"><span class="ic">Py</span></div>
-      <div class="float-badge fb3"><span class="ic">⚛</span>React</div>
-      <div class="float-badge fb4"><span class="ic">C++</span></div>
+      <div class="portrait-frame">
+        <img src="haris.jpg" alt="Haris Jamil" width="1000" height="1256" fetchpriority="high" decoding="async" />
+      </div>
     </div>
   </div>
 </section>
@@ -84,67 +76,81 @@
 <!-- ABOUT -->
 <section id="about" class="pad">
   <div class="container">
-    <div class="about-text reveal">
-      <span class="sec-tag">About Me</span>
-      <h2>Turning Ideas Into <span class="gradient-text">Real Products</span></h2>
-      <div class="edu-card">
-        <div class="cap">🎓</div>
-        <div>
-          <h4>BS Computer Science (BSCS)</h4>
-          <span>Student · University of Central Punjab, Pakistan</span>
-        </div>
+    <div class="sec-head reveal">
+      <span class="sec-tag">About</span>
+      <h2>Full-stack by trade,<br /><em>researcher by rigor.</em></h2>
+    </div>
+    <div class="about-grid">
+      <div class="about-text reveal">
+        <p>I'm a Computer Science student working at the intersection of production engineering and applied machine learning.</p>
+        <p>I've been building full-stack products for clients as a <strong>freelance developer since 2025</strong>, and I'm currently a <strong>Research Partner at Alpha Solutions Research</strong>, where I work on ML/DL experimentation, data analysis, and IEEE-style academic writing.</p>
       </div>
-      <p>I’m <strong>Haris Jamil</strong>, a passionate Computer Science student and developer based in Pakistan. I love building <strong>fast, reliable, and modern</strong> digital solutions — from polished web apps and mobile apps to AI &amp; machine learning systems.</p>
-      <p>My goal is simple: take your vision and engineer it into technology that actually works for your success. I bring fresh ideas, clean code, and a relentless focus on quality to every project.</p>
-      <div class="skill-tags">
-        <span>JavaScript</span><span>Python</span><span>C++</span><span>Flutter</span>
-        <span>Android</span><span>React</span><span>Machine Learning</span><span>AI</span>
+      <div class="status-card reveal">
+        <div class="status-row"><span class="status-k">Role</span><span class="status-v">Full-stack dev &amp; Research Partner</span></div>
+        <div class="status-row"><span class="status-k">Focus</span><span class="status-v">Full-stack development, since 2025</span></div>
+        <div class="status-row"><span class="status-k">Research</span><span class="status-v">ML/DL, data analysis, academic writing</span></div>
+        <div class="status-row"><span class="status-k">Education</span><span class="status-v">BS Computer Science, UCP · Expected Spring 2027</span></div>
+        <div class="status-row"><span class="status-k">Location</span><span class="status-v">Lahore, Pakistan</span></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- SERVICES -->
-<section id="services" class="pad">
+<!-- SKILLS -->
+<section id="skills" class="pad">
   <div class="container">
     <div class="sec-head reveal">
-      <span class="sec-tag">What I Do</span>
-      <h2>Services I <span class="gradient-text">Deliver</span></h2>
-      <p>End-to-end engineering across platforms — built secure, fast, and made to scale.</p>
+      <span class="sec-tag">Skills</span>
+      <h2>What I <em>work with</em></h2>
     </div>
-    <div class="services-grid" id="servicesGrid">
-      <!-- cards injected -->
+    <div class="skills-grid">
+      <div class="skill-card reveal">
+        <h3>Full-Stack</h3>
+        <ul class="skill-list">
+          <li>Next.js</li><li>TypeScript</li><li>JavaScript</li><li>Node.js</li>
+          <li>Tailwind CSS</li><li>RESTful APIs</li><li>Supabase</li><li>Prisma</li><li>PostgreSQL</li>
+        </ul>
+      </div>
+      <div class="skill-card reveal">
+        <h3>Cloud, Infra &amp; Auth</h3>
+        <ul class="skill-list">
+          <li>AWS</li><li>Cloudflare</li><li>Vercel</li><li>OAuth</li><li>Firebase Auth</li>
+        </ul>
+      </div>
+      <div class="skill-card reveal">
+        <h3>ML/AI &amp; Research</h3>
+        <ul class="skill-list">
+          <li>Neural Networks</li><li>CNNs</li><li>Predictive Modeling</li>
+          <li>Model Evaluation</li><li>LLM API Integration</li>
+          <li>Research Methodology</li><li>Academic Paper Writing</li>
+        </ul>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- WHY -->
-<section id="why" class="pad">
+<!-- WORK -->
+<section id="work" class="pad">
   <div class="container">
     <div class="sec-head reveal">
-      <span class="sec-tag">Why Choose Me</span>
-      <h2>Engineered for <span class="gradient-text">Trust</span></h2>
-      <p>Quality you can measure and a partner you can rely on at every step.</p>
+      <span class="sec-tag">Selected Work</span>
+      <h2>Products <em>in production</em></h2>
+      <p>Three live platforms, built end-to-end — from data model to deploy.</p>
     </div>
-    <div class="why-grid">
-      <div class="why-card reveal">
-        <div class="big-ic">🚀</div>
-        <div><div class="stat-num gradient-text">Numerous</div><h4>Projects Delivered</h4><span>Across web, mobile & AI</span></div>
-      </div>
-      <div class="why-card reveal">
-        <div class="big-ic">😊</div>
-        <div><div class="stat-num gradient-text"><span class="count" data-target="100">0</span>%</div><h4>Client Satisfaction</h4><span>Built around your goals</span></div>
-      </div>
-      <div class="why-card reveal">
-        <div class="big-ic">⏱️</div>
-        <div><div class="stat-num gradient-text"><span class="count" data-target="24">0</span>/7</div><h4>Support & Delivery</h4><span>Fast, dependable response</span></div>
-      </div>
+
+    <div class="work-list" id="workList"><!-- rows injected by main.js --></div>
+  </div>
+</section>
+
+<!-- RESEARCH -->
+<section id="research" class="pad pad-tight">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="sec-tag">Research</span>
+      <h2>Applied research</h2>
+      <p>Work carried out as a Research Partner at Alpha Solutions Research — model building, evaluation, and academic writing.</p>
     </div>
-    <div class="badge-row">
-      <div class="badge-mini reveal"><span class="ic">🛡️</span>SECURE &amp; RELIABLE</div>
-      <div class="badge-mini reveal"><span class="ic">⚡</span>FAST DELIVERY</div>
-      <div class="badge-mini reveal"><span class="ic">✅</span>QUALITY GUARANTEED</div>
-    </div>
+    <div class="research-list" id="researchList"><!-- rows injected by main.js --></div>
   </div>
 </section>
 
@@ -152,20 +158,13 @@
 <section id="contact" class="pad">
   <div class="container">
     <div class="cta-box reveal">
-      <span class="sec-tag">Let's Talk</span>
-      <h2>Let’s Build Something <span class="gradient-text">Great!</span></h2>
-      <p>Have a project in mind? Let’s turn your vision into reality with the right technology.</p>
+      <span class="sec-tag">Contact</span>
+      <h2>Have a project —<br /><em>or a research problem?</em></h2>
+      <p>Open to full-stack engineering roles, freelance builds, and applied ML/DL research collaboration.</p>
       <div class="cta-actions">
-        <a href="https://wa.me/923440766838" target="_blank" class="btn btn-wa wa-pulse">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.945C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.51 5.26l-.999 3.648 3.978-1.045z"/></svg>
-          Chat on WhatsApp
-        </a>
-        <a href="#hero" class="btn btn-ghost">Back to Top ↑</a>
-      </div>
-      <div class="contact-meta">
-        <a href="https://wa.me/923440766838" target="_blank">📞 +92 344 0766838</a>
-        <a>📍 Pakistan</a>
-        <a href="https://www.linkedin.com/in/haris-jamil-20710b309" target="_blank">in LinkedIn</a>
+        <a href="https://wa.me/923440766838" target="_blank" rel="noopener" class="btn btn-primary"><svg viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.945C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.51 5.26l-.999 3.648 3.978-1.045z"/></svg>WhatsApp</a>
+        <a href="mailto:harisjamilpk@gmail.com" class="btn btn-ghost"><svg viewBox="0 0 24 24"><path d="M12 12.713l-11.985-9.713h23.97l-11.985 9.713zm0 2.574l-12-9.725v15.438h24v-15.438l-12 9.725z"/></svg>Email</a>
+        <a href="https://www.linkedin.com/in/haris-jamil-20710b309" target="_blank" rel="noopener" class="btn btn-ghost"><svg viewBox="0 0 24 24"><path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.27c-.97 0-1.75-.79-1.75-1.76s.78-1.75 1.75-1.75 1.75.79 1.75 1.75-.78 1.76-1.75 1.76zm13.5 12.27h-3v-5.6c0-3.37-4-3.11-4 0v5.6h-3v-11h3v1.76c1.4-2.59 7-2.78 7 2.48v6.76z"/></svg>LinkedIn</a>
       </div>
     </div>
   </div>
@@ -173,26 +172,14 @@
 
 <!-- FOOTER -->
 <footer>
-  <svg class="skyline" viewBox="0 0 1440 140" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#0a0e23"/>
-        <stop offset="100%" stop-color="#05060f"/>
-      </linearGradient>
-    </defs>
-    <path fill="url(#sky)" d="M0,140 L0,90 L40,90 L40,70 L80,70 L80,95 L120,95 L120,55 L150,55 L150,40 L165,28 L180,40 L180,55 L210,55 L210,80 L250,80 L250,60 L290,60 L290,100 L330,100 L330,50 L360,50 L360,35 L375,35 L375,20 L390,20 L390,35 L405,35 L405,75 L445,75 L445,90 L490,90 L490,65 L530,65 L530,85 L570,85 L570,45 L600,45 L600,30 L615,18 L630,30 L630,60 L670,60 L670,95 L710,95 L710,70 L750,70 L750,88 L790,88 L790,52 L820,52 L820,38 L835,38 L835,22 L850,22 L850,38 L865,38 L865,72 L905,72 L905,92 L945,92 L945,58 L985,58 L985,82 L1025,82 L1025,48 L1055,48 L1055,32 L1070,20 L1085,32 L1085,62 L1125,62 L1125,96 L1165,96 L1165,68 L1205,68 L1205,86 L1245,86 L1245,50 L1275,50 L1275,34 L1290,34 L1290,18 L1305,18 L1305,34 L1320,34 L1320,74 L1360,74 L1360,92 L1400,92 L1400,66 L1440,66 L1440,140 Z"/>
-  </svg>
-  <div class="footer-body">
-    <div class="container footer-inner">
-      <a href="#hero" class="brand"><span class="dot"></span>HARIS<span class="gradient-text">.DEV</span></a>
-      <p style="color:var(--muted);max-width:440px;font-size:.9rem">Smart Solutions Built for Your Success — Your Vision. My Technology. Unlimited Possibilities.</p>
-      <div class="socials">
-        <a class="soc" href="https://www.linkedin.com/in/haris-jamil-20710b309" target="_blank" aria-label="LinkedIn"><svg viewBox="0 0 24 24"><path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.27c-.97 0-1.75-.79-1.75-1.76s.78-1.75 1.75-1.75 1.75.79 1.75 1.75-.78 1.76-1.75 1.76zm13.5 12.27h-3v-5.6c0-3.37-4-3.11-4 0v5.6h-3v-11h3v1.76c1.4-2.59 7-2.78 7 2.48v6.76z"/></svg></a>
-        <a class="soc" href="https://wa.me/923440766838" target="_blank" aria-label="WhatsApp"><svg viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.945C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24z"/></svg></a>
-        <a class="soc" href="mailto:harisjamil1616@gmail.com" aria-label="Email"><svg viewBox="0 0 24 24"><path d="M12 12.713l-11.985-9.713h23.97l-11.985 9.713zm0 2.574l-12-9.725v15.438h24v-15.438l-12 9.725z"/></svg></a>
-      </div>
-      <div class="copy">© 2026 Haris Jamil. All rights reserved. · Crafted with 💙 in Pakistan</div>
+  <div class="container footer-inner">
+    <a href="#hero" class="brand">[&nbsp;Haris Jamil&nbsp;]<span class="brand-dot"></span></a>
+    <div class="socials">
+      <a class="soc" href="https://www.linkedin.com/in/haris-jamil-20710b309" target="_blank" rel="noopener" aria-label="LinkedIn"><svg viewBox="0 0 24 24"><path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.27c-.97 0-1.75-.79-1.75-1.76s.78-1.75 1.75-1.75 1.75.79 1.75 1.75-.78 1.76-1.75 1.76zm13.5 12.27h-3v-5.6c0-3.37-4-3.11-4 0v5.6h-3v-11h3v1.76c1.4-2.59 7-2.78 7 2.48v6.76z"/></svg></a>
+      <a class="soc" href="https://wa.me/923440766838" target="_blank" rel="noopener" aria-label="WhatsApp"><svg viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.945C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.51 5.26l-.999 3.648 3.978-1.045z"/></svg></a>
+      <a class="soc" href="mailto:harisjamilpk@gmail.com" aria-label="Email"><svg viewBox="0 0 24 24"><path d="M12 12.713l-11.985-9.713h23.97l-11.985 9.713zm0 2.574l-12-9.725v15.438h24v-15.438l-12 9.725z"/></svg></a>
     </div>
+    <div class="copy">© 2026 Haris Jamil · Lahore, Pakistan</div>
   </div>
 </footer>
 

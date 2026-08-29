@@ -1,304 +1,259 @@
 /* ==========================================================================
    Haris Jamil — Portfolio styles
 
-   MOBILE / PERFORMANCE NOTES (see README.md for the full writeup):
-   - Custom cursor (.cursor-dot/.cursor-ring) and `cursor:none` are disabled
-     on touch devices via `(hover:none) and (pointer:coarse)`, not just a
-     width breakpoint, so touch laptops/tablets are caught too.
-   - backdrop-filter blur is expensive on mobile GPUs. Desktop keeps the
-     original radii; a mobile/touch block near the bottom of this file
-     shrinks or removes blur on ~15 glassmorphism elements.
-   - The spinning .portrait-ring / reverse-spin image animation is disabled
-     on mobile/touch (it's a big, always-running, GPU-composited rotation).
+   DESIGN SYSTEM
+   - Near-black ground, single amber accent (--accent). No rainbow gradients.
+   - Type: Fraunces (serif, headings — italic used sparingly for emphasis),
+     Inter (body), IBM Plex Mono (spec-sheet labels / eyebrows / utility).
+   - Recurring motif: project/research/about content rendered as compact
+     "spec sheet" rows (mono key + value) rather than icon+paragraph cards —
+     it's the one throughline that ties the dev-and-researcher identity
+     together and replaces the old glassmorphism/neon look.
+
+   MOBILE / PERFORMANCE NOTES
+   - There is exactly one backdrop-filter left (the scrolled nav bar); it's
+     softened on mobile/touch below.
+   - The hero's Three.js canvas (js/bg-scene.js) is scoped to #hero only —
+     not a fixed full-page canvas — and is skipped entirely on mobile/touch
+     (see js/main.js loader), so mobile gets the static gradient wash only.
    - `prefers-reduced-motion: reduce` gets a blanket override near the top
-     that collapses all CSS animations/transitions to effectively instant —
-     this covers pulse/floaty/spin/wapulse and the .reveal/hero transitions
-     in one place instead of repeating the condition per rule.
-   - `.card` no longer carries a permanent `will-change: transform`; it's
-     toggled on/off in JS only while a card is actually being tilted
-     (see js/cursor.js) or revealed (see js/main.js).
+     that collapses all CSS animations/transitions to effectively instant.
+   - `.work-row`/`.reveal` don't carry a permanent `will-change`; it's
+     toggled in JS only while something is actually animating.
    ========================================================================== */
 
 :root{
-  --bg:#05060f;
-  --bg2:#0a0e23;
-  --cyan:#22d3ee;
-  --blue:#3b82f6;
-  --violet:#8b5cf6;
-  --pink:#e879f9;
-  --text:#e8edf7;
-  --muted:#9aa6c2;
-  --glass:rgba(255,255,255,0.05);
-  --glass-border:rgba(255,255,255,0.12);
-  --radius:20px;
+  --bg:#0b0c0e;
+  --surface:#131418;
+  --surface-2:#17181c;
+  --border:rgba(255,255,255,.09);
+  --border-strong:rgba(255,255,255,.18);
+  --text:#eef0f2;
+  --muted:#9498a1;
+  --muted-2:#6c6f78;
+  --accent:#e3a53c;
+  --accent-soft:rgba(227,165,60,.10);
+  --accent-soft-2:rgba(227,165,60,.28);
+  --f-serif:'Fraunces',Georgia,serif;
+  --f-sans:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  --f-mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --radius:14px;
 }
 
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{
-  font-family:'Inter',sans-serif;
+  font-family:var(--f-sans);
   background:var(--bg);
   color:var(--text);
   overflow-x:hidden;
-  cursor:none;
 }
-@media (max-width:820px), (hover:none) and (pointer:coarse){ body{cursor:auto} }
-
-h1,h2,h3,.brand,.nav-link,.stat-num,.typed,.badge-mini{font-family:'Orbitron',sans-serif}
+::selection{background:var(--accent);color:#0b0c0e}
 
 a{color:inherit;text-decoration:none}
-.container{width:min(1180px,92%);margin:0 auto;position:relative;z-index:2}
+.container{width:min(1140px,92%);margin:0 auto;position:relative;z-index:2}
 section{position:relative}
+em{font-style:italic;color:var(--accent);font-family:inherit}
 
-.gradient-text{
-  background:linear-gradient(120deg,var(--cyan),var(--blue) 40%,var(--violet) 70%,var(--pink));
-  -webkit-background-clip:text;background-clip:text;
-  -webkit-text-fill-color:transparent;color:transparent;
-}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
 
-/* ===== Background canvases ===== */
-#bg3d{position:fixed;inset:0;z-index:0;}
-#code-canvas{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.5}
+/* ===== Page wash — single soft amber glow, not a rainbow ===== */
 .bg-gradient{
-  position:fixed;inset:0;z-index:0;pointer-events:none;
+  position:fixed;inset:0;z-index:-1;pointer-events:none;
   background:
-    radial-gradient(60% 50% at 15% 10%, rgba(34,211,238,.12), transparent 60%),
-    radial-gradient(50% 50% at 85% 20%, rgba(139,92,246,.14), transparent 60%),
-    radial-gradient(60% 60% at 50% 100%, rgba(59,130,246,.12), transparent 60%),
-    linear-gradient(180deg,var(--bg),var(--bg2));
+    radial-gradient(46% 38% at 82% 0%, rgba(227,165,60,.07), transparent 60%),
+    linear-gradient(180deg,var(--bg),#0e0f12 60%,var(--bg));
 }
-
-/* ===== Custom cursor (desktop / pointer devices only) ===== */
-.cursor-dot,.cursor-ring{position:fixed;top:0;left:0;border-radius:50%;pointer-events:none;z-index:9999;mix-blend-mode:screen;transform:translate(-50%,-50%)}
-.cursor-dot{width:8px;height:8px;background:var(--cyan);box-shadow:0 0 14px var(--cyan)}
-.cursor-ring{width:38px;height:38px;border:1.5px solid rgba(34,211,238,.6);transition:width .2s,height .2s,border-color .2s,background .2s}
-.cursor-ring.active{width:60px;height:60px;border-color:var(--violet);background:rgba(139,92,246,.12)}
-@media (max-width:820px), (hover:none) and (pointer:coarse){.cursor-dot,.cursor-ring{display:none}}
 
 /* ===== Navbar ===== */
-nav{position:fixed;top:0;left:0;width:100%;z-index:100;transition:.4s;padding:18px 0}
-nav.scrolled{background:rgba(8,10,24,.7);backdrop-filter:blur(16px);border-bottom:1px solid var(--glass-border);padding:12px 0}
-.nav-inner{display:flex;align-items:center;justify-content:space-between}
-.brand{font-weight:900;font-size:1.4rem;letter-spacing:1px;display:flex;align-items:center;gap:10px}
-.brand .dot{width:12px;height:12px;border-radius:50%;background:linear-gradient(135deg,var(--cyan),var(--violet));box-shadow:0 0 16px var(--cyan)}
-.nav-links{display:flex;gap:30px;align-items:center}
-.nav-link{font-size:.82rem;letter-spacing:1px;color:var(--muted);transition:.25s;position:relative}
-.nav-link:hover{color:#fff;text-shadow:0 0 12px var(--cyan)}
-.nav-link::after{content:'';position:absolute;left:0;bottom:-6px;height:2px;width:0;background:linear-gradient(90deg,var(--cyan),var(--violet));transition:.3s}
-.nav-link:hover::after{width:100%}
-.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:6px}
-.hamburger span{width:26px;height:2px;background:#fff;transition:.3s;border-radius:2px}
-.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+nav{position:fixed;top:0;left:0;width:100%;z-index:100;transition:.35s;padding:22px 0}
+nav.scrolled{background:rgba(11,12,14,.78);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);padding:14px 0}
+.nav-inner{display:grid;grid-template-columns:1fr auto 1fr;align-items:center}
+.brand{grid-column:1;justify-self:start;font-family:var(--f-mono);font-weight:600;font-size:.95rem;letter-spacing:.04em;display:inline-flex;align-items:center;gap:8px}
+.brand-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);animation:pulse 1.8s infinite}
+.nav-links{grid-column:2;justify-self:center;display:flex;gap:32px;align-items:center}
+.nav-link{font-family:var(--f-mono);font-size:.78rem;letter-spacing:.06em;color:var(--muted);transition:.2s}
+.nav-link:hover{color:var(--accent)}
+.hamburger{grid-column:3;justify-self:end;display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:6px}
+.hamburger span{width:24px;height:1.5px;background:var(--text);transition:.3s;border-radius:2px}
+.hamburger.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
 .hamburger.open span:nth-child(2){opacity:0}
-.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.hamburger.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
 
 @media (max-width:820px){
   .hamburger{display:flex}
-  .nav-links{position:fixed;top:0;right:-100%;height:100vh;width:72%;max-width:320px;flex-direction:column;justify-content:center;gap:34px;background:rgba(8,10,24,.96);backdrop-filter:blur(18px);border-left:1px solid var(--glass-border);transition:.4s;z-index:99}
+  /* Solid background, no backdrop-filter: a blurred fixed panel that also
+     transitions `right` can fail to composite its background in some
+     Chromium builds, leaving the panel see-through. The bg is dark enough
+     on its own that blur added nothing anyway. */
+  .nav-links{position:fixed;top:0;right:-100%;height:100vh;width:72%;max-width:300px;flex-direction:column;justify-content:center;gap:30px;background:rgb(11,12,14);border-left:1px solid var(--border);transition:.4s;z-index:99}
   .nav-links.open{right:0}
-  .nav-link{font-size:1rem}
+  .nav-link{font-size:.95rem}
 }
 
 /* ===== Buttons ===== */
-.btn{display:inline-flex;align-items:center;gap:10px;padding:14px 28px;border-radius:50px;font-weight:600;font-size:.92rem;cursor:none;border:1px solid transparent;transition:.3s;position:relative}
-@media (max-width:820px), (hover:none) and (pointer:coarse){.btn{cursor:pointer}}
-.btn-primary{background:linear-gradient(120deg,var(--cyan),var(--blue),var(--violet));color:#05060f;box-shadow:0 0 0 rgba(34,211,238,0)}
-.btn-primary:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(59,130,246,.5)}
-.btn-ghost{background:var(--glass);border:1px solid var(--glass-border);color:#fff;backdrop-filter:blur(10px)}
-.btn-ghost:hover{border-color:var(--cyan);box-shadow:0 0 26px rgba(34,211,238,.4);transform:translateY(-3px)}
-.btn-wa{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff}
-.btn-wa:hover{transform:translateY(-3px);box-shadow:0 0 30px rgba(37,211,102,.55)}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 26px;border-radius:8px;font-family:var(--f-mono);font-weight:500;font-size:.82rem;letter-spacing:.02em;border:1px solid transparent;transition:.25s;cursor:pointer}
+.btn-primary{background:var(--accent);color:#181104}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(227,165,60,.28)}
+.btn-ghost{background:transparent;border:1px solid var(--border-strong);color:var(--text)}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-2px)}
+.btn svg{width:16px;height:16px;fill:currentColor;flex-shrink:0}
 
 /* ===== HERO ===== */
-#hero{min-height:100vh;min-height:100svh;display:flex;align-items:center;padding:120px 0 80px}
-.hero-grid{display:grid;grid-template-columns:1.25fr .9fr;gap:40px;align-items:center}
-.eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:'Orbitron';font-size:.72rem;letter-spacing:2px;color:var(--cyan);border:1px solid var(--glass-border);background:var(--glass);padding:8px 16px;border-radius:50px;margin-bottom:24px;backdrop-filter:blur(8px)}
-.eyebrow .pulse{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan);animation:pulse 1.6s infinite}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
-h1.hero-title{font-size:clamp(2.4rem,6vw,4.6rem);line-height:1.05;font-weight:900;letter-spacing:-1px;margin-bottom:14px}
-.typed-wrap{font-size:clamp(1.1rem,3vw,1.9rem);font-weight:700;min-height:1.6em;margin-bottom:18px}
-.typed{color:var(--cyan)}
-.cursor-blink{display:inline-block;width:3px;height:1.05em;background:var(--violet);margin-left:4px;vertical-align:text-bottom;animation:blink 1s step-end infinite}
-@keyframes blink{50%{opacity:0}}
-.hero-sub{color:var(--muted);font-size:1.05rem;max-width:520px;margin-bottom:14px;line-height:1.6}
-.hero-tags{color:var(--muted);font-size:.9rem;margin-bottom:28px}
-.hero-cta{display:flex;gap:16px;flex-wrap:wrap}
+#hero{min-height:100vh;min-height:100svh;display:flex;align-items:center;padding:130px 0 70px;overflow:hidden}
+#bg3d{position:absolute;inset:0;z-index:0;-webkit-mask-image:linear-gradient(180deg,#000 55%,transparent 96%);mask-image:linear-gradient(180deg,#000 55%,transparent 96%)}
+.hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:48px;align-items:center}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.7)}}
 
-/* Hero entrance — plain CSS keyframes (no JS animation library needed). */
-@keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
-@keyframes fadeInScale{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+h1.hero-title{font-family:var(--f-serif);font-weight:600;font-size:clamp(2.5rem,5.6vw,4.3rem);line-height:1.08;letter-spacing:-.01em;margin-bottom:34px}
+h1.hero-title em{font-weight:500}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap}
+
+/* Hero entrance — plain CSS keyframes */
+@keyframes fadeInUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeInScale{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
 .hero-left > *{opacity:0;animation:fadeInUp .8s cubic-bezier(.215,.61,.355,1) forwards}
-.hero-left > *:nth-child(1){animation-delay:.2s}
-.hero-left > *:nth-child(2){animation-delay:.32s}
-.hero-left > *:nth-child(3){animation-delay:.44s}
-.hero-left > *:nth-child(4){animation-delay:.56s}
-.portrait-wrap{opacity:0;animation:fadeInScale 1s cubic-bezier(.215,.61,.355,1) .3s forwards}
+.hero-left > *:nth-child(1){animation-delay:.15s}
+.hero-left > *:nth-child(2){animation-delay:.3s}
+.portrait-wrap{opacity:0;animation:fadeInScale .9s cubic-bezier(.215,.61,.355,1) .3s forwards}
 
-/* hero portrait */
-.portrait-wrap{position:relative;display:flex;justify-content:center}
-.portrait-ring{position:relative;width:min(360px,80vw);aspect-ratio:1;border-radius:50%;padding:6px;background:conic-gradient(from 0deg,var(--cyan),var(--violet),var(--pink),var(--blue),var(--cyan));animation:spin 9s linear infinite;box-shadow:0 0 60px rgba(59,130,246,.4)}
-@keyframes spin{to{transform:rotate(360deg)}}
-.portrait-ring img{width:100%;height:100%;object-fit:cover;border-radius:50%;border:5px solid var(--bg);animation:spin 9s linear infinite reverse}
-.float-badge{position:absolute;display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:14px;background:var(--glass);border:1px solid var(--glass-border);backdrop-filter:blur(12px);font-size:.78rem;font-weight:600;box-shadow:0 8px 30px rgba(0,0,0,.4);font-family:'Orbitron'}
-.float-badge .ic{font-size:1.1rem}
-.fb1{top:8%;left:-6%;color:#f7df1e;animation:floaty 4s ease-in-out infinite}
-.fb2{top:42%;right:-12%;color:#3776ab;animation:floaty 5s ease-in-out infinite .6s}
-.fb3{bottom:8%;left:-10%;color:#61dafb;animation:floaty 4.5s ease-in-out infinite .3s}
-.fb4{bottom:22%;right:-6%;color:#00599c;animation:floaty 5.5s ease-in-out infinite .9s}
-@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+/* hero portrait — hard-edged frame with two corner brackets, not a
+   spinning gradient ring; ties into the spec-sheet/figure motif.
+   aspect-ratio is a portrait crop (not square) to suit the source photo,
+   which is a tall waist-up shot — object-position:top keeps the crop
+   anchored on the face/shoulders rather than centering into the torso. */
+.portrait-wrap{display:flex;justify-content:center}
+.portrait-frame{position:relative;width:min(320px,78vw);aspect-ratio:.85;padding:12px}
+.portrait-frame::before,.portrait-frame::after{content:'';position:absolute;width:22px;height:22px;border:2px solid var(--accent)}
+.portrait-frame::before{top:0;left:0;border-right:none;border-bottom:none}
+.portrait-frame::after{bottom:0;right:0;border-left:none;border-top:none}
+.portrait-frame img{width:100%;height:100%;object-fit:cover;object-position:center 70%;border-radius:3px;border:1px solid var(--border-strong);display:block}
 
 @media (max-width:880px){
   .hero-grid{grid-template-columns:1fr;text-align:center}
   .hero-cta{justify-content:center}
-  .hero-sub{margin-inline:auto}
-  .portrait-wrap{order:-1;margin-bottom:20px}
-  .eyebrow{margin-inline:auto}
-
-  /* .float-badge is positioned with % left/right/top/bottom relative to
-     .portrait-wrap. In the 2-column desktop layout .portrait-wrap is sized
-     by its own grid track, close to the ring's own width — but once the
-     grid collapses to a single column here, .portrait-wrap stretches to
-     the FULL container width while the ring itself stays capped at
-     min(360px,80vw). The badges' negative offsets (e.g. fb2 right:-12%)
-     were then computed against that much wider box and pushed off-screen
-     at 320/375/768px. Constraining .portrait-wrap to the ring's own width
-     makes the badges float relative to the ring again, at every mobile
-     width, without touching the desktop 2-column CSS above. */
-  .portrait-wrap{width:min(360px,80vw);margin-inline:auto}
+  .portrait-wrap{order:-1;margin-bottom:28px}
 }
 
-/* Narrow phones: shrink the badges a touch so their text/icon has room
-   inside the now-tighter (ring-width) positioning box. */
-@media (max-width:480px){
-  .float-badge{padding:7px 11px;font-size:.68rem;gap:6px}
-  .float-badge .ic{font-size:.95rem}
-  .edu-card{padding:16px 18px;gap:12px}
-  .edu-card .cap{width:46px;height:46px;font-size:1.5rem}
-}
+/* ===== About =====
+   The "About" eyebrow + heading live in the shared .sec-head above (same
+   component Skills/Work/Research/Contact use), so they're centered on the
+   page like every other section heading. .about-grid is just the row
+   below it — text left, status card right, top-aligned to each other
+   with no manual offset needed. */
+.about-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:start}
+.sec-tag{font-family:var(--f-mono);color:var(--accent);letter-spacing:.14em;font-size:.72rem;text-transform:uppercase}
+.about-text p{color:var(--muted);line-height:1.75;margin-bottom:16px;max-width:52ch}
+.about-text strong{color:var(--text);font-weight:600}
 
-/* ===== About ===== */
-.about-text{max-width:760px;margin:0 auto;text-align:center}
-.about-text h2{font-size:clamp(1.9rem,4.5vw,2.8rem);font-weight:900;margin:10px 0 22px}
-.about-text p{color:var(--muted);line-height:1.7;margin-bottom:16px}
-.about-text strong{color:var(--text)}
-.edu-card{display:inline-flex;gap:16px;align-items:center;text-align:left;padding:20px 26px;border-radius:18px;background:var(--glass);border:1px solid var(--glass-border);backdrop-filter:blur(12px);margin-bottom:26px}
-.edu-card .cap{font-size:1.8rem;width:56px;height:56px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(135deg,rgba(34,211,238,.2),rgba(139,92,246,.2));flex-shrink:0}
-.edu-card h4{font-family:'Inter';font-size:1rem;margin-bottom:3px}
-.edu-card span{color:var(--muted);font-size:.85rem}
-.skill-tags{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:6px}
-.skill-tags span{font-size:.78rem;padding:7px 14px;border-radius:50px;background:var(--glass);border:1px solid var(--glass-border);transition:.3s}
-.skill-tags span:hover{border-color:var(--cyan);color:var(--cyan);box-shadow:0 0 18px rgba(34,211,238,.3)}
+.status-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:6px 24px}
+.status-row{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:16px 0;border-bottom:1px solid var(--border)}
+.status-row:last-child{border-bottom:none}
+.status-k{font-family:var(--f-mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted-2);flex-shrink:0}
+.status-v{font-size:.88rem;color:var(--text);text-align:right}
+
+@media (max-width:900px){
+  .about-grid{grid-template-columns:1fr;gap:36px}
+  .about-text p{max-width:none}
+  .status-v{text-align:right}
+}
 
 /* ===== Section heading ===== */
-.sec-head{text-align:center;margin-bottom:54px}
-.sec-tag{font-family:'Orbitron';color:var(--cyan);letter-spacing:3px;font-size:.78rem;text-transform:uppercase}
-.sec-head h2{font-size:clamp(1.9rem,4.5vw,3rem);font-weight:900;margin-top:10px}
-.sec-head p{color:var(--muted);margin-top:12px;max-width:560px;margin-inline:auto}
-.pad{padding:100px 0}
+.sec-head{text-align:center;margin-bottom:54px;max-width:620px;margin-inline:auto}
+.sec-head h2{font-family:var(--f-serif);font-weight:600;font-size:clamp(1.9rem,4vw,2.5rem);margin-top:12px}
+.sec-head h2 em{font-weight:500}
+.sec-head p{color:var(--muted);margin-top:14px;font-size:.98rem;line-height:1.6}
+.pad{padding:110px 0}
+.pad-tight{padding:60px 0 110px}
 
-/* ===== Services ===== */
-.services-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
-@media(max-width:1000px){.services-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:560px){.services-grid{grid-template-columns:1fr}}
-.card{position:relative;padding:30px 26px;border-radius:var(--radius);background:var(--glass);border:1px solid var(--glass-border);backdrop-filter:blur(14px);overflow:hidden;transition:border-color .3s,box-shadow .3s;transform-style:preserve-3d}
-.card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(34,211,238,.12),transparent 50%);opacity:0;transition:.3s}
-.card:hover{border-color:rgba(34,211,238,.6);box-shadow:0 18px 50px rgba(34,211,238,.22),0 0 30px rgba(139,92,246,.18)}
-.card:hover::before{opacity:1}
-.card .ico{width:56px;height:56px;border-radius:16px;display:grid;place-items:center;font-size:1.7rem;margin-bottom:18px;background:linear-gradient(135deg,rgba(34,211,238,.18),rgba(139,92,246,.18));border:1px solid var(--glass-border);transform:translateZ(40px)}
-.card h3{font-family:'Inter';font-size:1.12rem;font-weight:700;margin-bottom:10px;transform:translateZ(30px)}
-.card p{color:var(--muted);font-size:.9rem;line-height:1.55;transform:translateZ(20px)}
+/* ===== Skills ===== */
+.skills-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+@media(max-width:900px){.skills-grid{grid-template-columns:1fr}}
+.skill-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:30px 28px;transition:border-color .25s}
+.skill-card:hover{border-color:var(--border-strong)}
+.skill-card h3{font-family:var(--f-mono);font-size:.76rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.skill-list{list-style:none}
+.skill-list li{font-size:.95rem;color:var(--text);padding:10px 0 10px 20px;border-bottom:1px solid var(--border);position:relative}
+.skill-list li:last-child{border-bottom:none}
+.skill-list li::before{content:'—';position:absolute;left:0;color:var(--muted-2)}
 
-/* ===== Why choose us ===== */
-.why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
-@media(max-width:820px){.why-grid{grid-template-columns:1fr}}
-/* min-width:0 overrides the flex/grid item default of min-width:auto, which
-   otherwise sizes .why-card (and its text column) to the "Numerous" stat's
-   unbroken min-content width — wider than a 320px viewport's container,
-   forcing the whole page to scroll horizontally. overflow-wrap on .stat-num
-   is the fallback so that word can still break as a last resort. */
-.why-card{display:flex;gap:18px;align-items:center;padding:28px;border-radius:var(--radius);background:var(--glass);border:1px solid var(--glass-border);backdrop-filter:blur(14px);transition:.3s;min-width:0}
-.why-card:hover{transform:translateY(-6px);box-shadow:0 16px 44px rgba(59,130,246,.25);border-color:rgba(59,130,246,.5)}
-.why-card .big-ic{font-size:2.2rem;width:64px;height:64px;display:grid;place-items:center;border-radius:18px;background:linear-gradient(135deg,rgba(34,211,238,.2),rgba(139,92,246,.2));flex-shrink:0}
-.why-card > div{min-width:0}
-/* clamp() shrinks "Numerous" enough to stay on one line down to 320px
-   instead of relying on the overflow-wrap fallback below to break it
-   mid-word; overflow-wrap stays only as a defensive last resort. */
-.stat-num{font-size:clamp(1.6rem,5vw,2.1rem);font-weight:900;line-height:1;overflow-wrap:break-word}
-.why-card h4{margin:6px 0 4px;font-size:1rem}
-.why-card span{color:var(--muted);font-size:.85rem}
+/* ===== Work (case-study rows) ===== */
+.work-list{display:flex;flex-direction:column;gap:26px}
+.work-row{display:grid;grid-template-columns:1.05fr .95fr;border:1px solid var(--border);border-radius:16px;overflow:hidden;background:var(--surface);transition:border-color .3s,box-shadow .3s;transform-style:preserve-3d}
+.work-row:hover{border-color:var(--accent-soft-2);box-shadow:0 24px 60px rgba(0,0,0,.35)}
+.work-row.flip{grid-template-columns:.95fr 1.05fr}
+.work-row.flip .work-media{order:2}
+.work-row.flip .work-body{order:1}
+.work-media{position:relative;overflow:hidden;background:#000;min-height:260px}
+.work-media img{width:100%;height:100%;object-fit:cover;object-position:top;display:block;filter:saturate(.94);transition:transform .6s ease}
+.work-row:hover .work-media img{transform:scale(1.035)}
+.work-media::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 65%,rgba(0,0,0,.3));pointer-events:none}
+.work-body{padding:36px 40px;display:flex;flex-direction:column;justify-content:center;gap:16px}
+.work-index{font-family:var(--f-mono);font-size:.7rem;color:var(--muted-2);letter-spacing:.12em}
+.work-title{font-family:var(--f-serif);font-weight:600;font-size:clamp(1.3rem,2.2vw,1.6rem)}
+.work-title a{transition:.2s}
+.work-title a:hover{color:var(--accent)}
+.work-spec{display:flex;flex-direction:column;gap:11px}
+.work-spec-row{display:flex;gap:12px;font-size:.88rem;line-height:1.55}
+.work-spec-k{font-family:var(--f-mono);color:var(--accent);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;flex-shrink:0;padding-top:4px;min-width:66px}
+.work-spec-v{color:var(--muted)}
+.work-stack{display:flex;flex-wrap:wrap;gap:8px;margin-top:2px}
+.work-stack span{font-family:var(--f-mono);font-size:.7rem;color:var(--text);background:var(--accent-soft);border:1px solid var(--accent-soft-2);padding:4px 9px;border-radius:5px}
+.work-link{font-family:var(--f-mono);font-size:.82rem;color:var(--accent);display:inline-flex;align-items:center;gap:6px;margin-top:4px;width:fit-content;border-bottom:1px solid transparent;transition:.2s}
+.work-link:hover{border-color:var(--accent)}
 
-/* badges row */
-.badge-row{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin-top:50px}
-.badge-mini{display:flex;align-items:center;gap:10px;padding:12px 22px;border-radius:50px;background:var(--glass);border:1px solid var(--glass-border);backdrop-filter:blur(10px);font-size:.8rem;letter-spacing:1px;transition:.3s}
-.badge-mini:hover{border-color:var(--cyan);box-shadow:0 0 24px rgba(34,211,238,.35)}
-.badge-mini .ic{color:var(--cyan);font-size:1.1rem}
+@media (max-width:760px){
+  .work-row,.work-row.flip{grid-template-columns:1fr}
+  .work-media{order:-1 !important;min-height:200px}
+  .work-body{order:1;padding:26px 22px}
+}
 
-/* ===== Contact CTA ===== */
-#contact .cta-box{text-align:center;padding:70px 40px;border-radius:30px;background:var(--glass);border:1px solid var(--glass-border);backdrop-filter:blur(16px);position:relative;overflow:hidden}
-#contact .cta-box::after{content:'';position:absolute;inset:0;background:radial-gradient(60% 80% at 50% 0%,rgba(139,92,246,.2),transparent 60%);pointer-events:none}
-#contact h2{font-size:clamp(2rem,5vw,3.4rem);font-weight:900;margin-bottom:16px}
-#contact p{color:var(--muted);max-width:520px;margin:0 auto 34px}
-.cta-actions{display:flex;gap:18px;justify-content:center;flex-wrap:wrap}
-.wa-pulse{position:relative}
-.wa-pulse::before{content:'';position:absolute;inset:0;border-radius:50px;background:#25D366;opacity:.6;animation:wapulse 2s infinite;z-index:-1}
-@keyframes wapulse{0%{transform:scale(1);opacity:.6}100%{transform:scale(1.4);opacity:0}}
-.contact-meta{display:flex;justify-content:center;gap:30px;flex-wrap:wrap;margin-top:34px;color:var(--muted);font-size:.9rem}
-.contact-meta a{display:flex;align-items:center;gap:8px;transition:.25s}
-.contact-meta a:hover{color:var(--cyan)}
+/* ===== Research (secondary — smaller, left-aligned, no imagery) ===== */
+.research-list{display:flex;flex-direction:column;max-width:760px}
+.research-row{display:grid;grid-template-columns:180px 1fr;gap:24px;padding:22px 0;border-bottom:1px solid var(--border)}
+.research-row:first-child{border-top:1px solid var(--border)}
+.research-tag{font-family:var(--f-mono);font-size:.68rem;color:var(--muted-2);letter-spacing:.08em;text-transform:uppercase;padding-top:3px}
+.research-body h3{font-size:1.02rem;font-weight:600;margin-bottom:6px;color:var(--text)}
+.research-body p{color:var(--muted);font-size:.9rem;line-height:1.6}
+@media (max-width:640px){
+  .research-row{grid-template-columns:1fr;gap:6px}
+}
+
+/* ===== Contact ===== */
+#contact .cta-box{text-align:center;padding:80px 40px;border-radius:20px;border:1px solid var(--border);background:var(--surface);position:relative;overflow:hidden}
+#contact .cta-box::after{content:'';position:absolute;inset:0;background:radial-gradient(50% 70% at 50% 0%,rgba(227,165,60,.08),transparent 65%);pointer-events:none}
+#contact h2{font-family:var(--f-serif);font-weight:600;font-size:clamp(2rem,4.6vw,2.9rem);line-height:1.15;margin-bottom:16px}
+#contact h2 em{font-weight:500}
+#contact p{color:var(--muted);max-width:480px;margin:0 auto}
+.cta-actions{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:38px;position:relative}
 
 @media (max-width:480px){
-  #contact .cta-box{padding:48px 22px}
+  #contact .cta-box{padding:52px 22px}
 }
 
 /* ===== Footer ===== */
-footer{position:relative;padding-top:80px;margin-top:40px}
-.skyline{display:block;width:100%;height:auto}
-.footer-body{background:rgba(5,6,15,.85);backdrop-filter:blur(10px);border-top:1px solid var(--glass-border);padding:40px 0 30px}
-.footer-inner{display:flex;flex-direction:column;align-items:center;gap:22px;text-align:center}
-.socials{display:flex;gap:16px}
-.soc{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:var(--glass);border:1px solid var(--glass-border);transition:.3s}
-.soc:hover{transform:translateY(-5px);border-color:var(--cyan);box-shadow:0 0 24px rgba(34,211,238,.4)}
-.soc svg{width:20px;height:20px;fill:var(--muted);transition:.3s}
-.soc:hover svg{fill:var(--cyan)}
-.copy{color:var(--muted);font-size:.82rem}
+footer{border-top:1px solid var(--border);padding:44px 0;margin-top:20px}
+.footer-inner{display:flex;flex-direction:column;align-items:center;gap:20px;text-align:center}
+.socials{display:flex;gap:14px}
+.soc{width:42px;height:42px;border-radius:10px;display:grid;place-items:center;border:1px solid var(--border);transition:.25s}
+.soc:hover{border-color:var(--accent);transform:translateY(-3px)}
+.soc svg{width:18px;height:18px;fill:var(--muted);transition:.2s}
+.soc:hover svg{fill:var(--accent)}
+.copy{color:var(--muted-2);font-size:.78rem;font-family:var(--f-mono)}
 
 /* ===== Scroll reveals (toggled by IntersectionObserver in js/main.js) ===== */
-.reveal{opacity:0;transform:translateY(40px);transition:opacity .8s cubic-bezier(.215,.61,.355,1),transform .8s cubic-bezier(.215,.61,.355,1)}
+.reveal{opacity:0;transform:translateY(32px);transition:opacity .75s cubic-bezier(.215,.61,.355,1),transform .75s cubic-bezier(.215,.61,.355,1)}
 .reveal.in-view{opacity:1;transform:translateY(0)}
 
 /* ==========================================================================
    Mobile / touch performance overrides
    ========================================================================== */
-
-/* backdrop-filter is one of the most expensive properties on mobile GPUs.
-   Desktop keeps full blur radii above; here we shrink or drop it entirely
-   for elements where the frosted-glass effect is purely decorative. */
 @media (max-width:768px), (hover:none) and (pointer:coarse){
   nav.scrolled{backdrop-filter:blur(8px)}
-  .nav-links{backdrop-filter:blur(10px)} /* full-screen panel: keep some blur for legibility */
-  .btn-ghost{backdrop-filter:blur(6px)}
-  .eyebrow{backdrop-filter:none}
-  .float-badge{backdrop-filter:none}
-  .edu-card{backdrop-filter:blur(6px)}
-  .card{backdrop-filter:blur(6px)}
-  .why-card{backdrop-filter:blur(6px)}
-  .badge-mini{backdrop-filter:none}
-  #contact .cta-box{backdrop-filter:blur(8px)}
-  .footer-body{backdrop-filter:blur(6px)}
-
-  /* The always-spinning conic-gradient ring + reverse-spin portrait image
-     is a full-viewport-relative element rotating continuously — disable
-     the rotation on mobile/touch and keep just the static gradient ring. */
-  .portrait-ring,.portrait-ring img{animation:none}
 }
 
 /* ==========================================================================
    prefers-reduced-motion: reduce
-   Blanket override — collapses every CSS animation/transition (pulse,
-   floaty, spin, wapulse, blink, hero entrance, .reveal, hover transitions)
-   to a single frame instead of repeating the media query on each rule.
-   `forwards`/final-state keyframes still land correctly, they just do so
-   immediately instead of animating there.
    ========================================================================== */
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{
